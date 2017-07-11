@@ -10,11 +10,13 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <script src="/d3/build/d3.min.js"></script>
+    <script src="/d3/d3.js"></script>
+    <script src="/c3/c3.js"></script>
     <script src="/d3-cloud/build/d3.layout.cloud.js"></script>
     <script src="/angular-d3-word-cloud/dist/angular-word-cloud.min.js"></script>
 
     <script src="/javascripts/index.js"></script>
+    <script src="/javascripts/wordcloud.js"></script>
 
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
@@ -31,6 +33,7 @@
         <link rel="icon" href="../../favicon.ico">
 
         <!-- Bootstrap core CSS -->
+
         <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
 
         <!-- Custom styles for this template -->
@@ -110,9 +113,10 @@
                         <div class="col-md-12 ">
                             <legend id="Visualization" style="color: #ffffff;">Data visualization</legend>
                             <div id="wordsCloud">
-                                <word-cloud words="words" width="width" height="height" padding="5" rotate="rotate"
+                                <!--word-cloud words="words" width="width" height="height" padding="5" rotate="rotate"
                                             on-click="wordClicked">
-                                </word-cloud>
+                                </word-cloud-->
+                                <div id="cloud" ng-show="words !== null"></div>
                             </div>
                         </div>
                         <div class="col-md-12 ">

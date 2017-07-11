@@ -14,7 +14,7 @@
         };
     }]);
 
-    var getTweets = angular.module('getTweets', ['tweets','ngMaterial', 'angular-d3-word-cloud']);
+    var getTweets = angular.module('getTweets', ['tweets','ngMaterial', 'angular-d3-word-cloud', ]);
 
     getTweets.config(['$httpProvider', function($httpProvider) {
         $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
@@ -38,39 +38,54 @@
         });
 
         $scope.click = function ($event) {
-            getTweets(getReps);
+            getTweets(getReps, getWords);
         }
 
-        function getTweets(callback) {
+        function getTweets(callback1, callback2) {
             tweetResource.tweet.getTweets({name: $scope.username}, function (data) {
                 $scope.tweets = data;
                 $scope.tweets.forEach(function (tweet) {
                     $scope.text += tweet;
                 });
                 $scope.search = true;
-                callback();
+                callback1();
+                callback2();
             });
 
         };
 
+        function getWords() {
+            var freq = {};
+            var texts;
+            texts = $scope.text.split(/\s+/g);
+
+
+
+
+            texts.forEach(function (word) {
+                if (!freq[word]) {
+                    freq[word] = 0;
+                }
+                freq[word] += 1;
+            });
+            for (let word in freq) {
+                $scope.words.push({text:word, size:freq[word]});
+            }
+            $scope.words.sort(function (a, b) {
+                return b.size - a.size;
+            })
+            $scope.words = $scope.words.slice(0, 50);
+
+            d3.wordcloud()
+                .size([800, 400])
+                .selector('#cloud')
+                .words($scope.words)
+                .start();
+        }
+
         function getReps() {
             tweetResource.summarizer.getRepTweet({text: $scope.text}, function (data) {
                 $scope.reps = data;
-                $scope.reps.forEach(function (list) {
-                    $scope.words += list.text;
-                })
-
-                $scope.words = $scope.words.split(/\s+/g);
-
-                $scope.words = $scope.words.map(function(word) {
-                    return {
-                        text: word,
-                        count: Math.floor(Math.random() * 4)
-                    }
-                }).sort(function(a, b) {
-                    return b.count - a.count;
-                })
-
             });
         };
 
@@ -92,21 +107,6 @@
             }
 
         };
-
-        var vv = document.getElementById("wordsCloud");
-        $scope.height = vv.offsetHeight;
-        $scope.width = vv.offsetWidth;
-        $scope.wordClicked = wordClicked;
-        $scope.rotate = rotate;
-
-        function rotate() {
-            return ~~(Math.random() * 2) * 90;
-        }
-
-        function wordClicked(word){
-            alert('text: ' + word.text + ',size: ' + word.size);
-        };
-
 
 
 
