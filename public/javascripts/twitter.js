@@ -92,7 +92,7 @@
             }
 
         };
-        /*
+
         var vv = document.getElementById("wordsCloud");
         $scope.height = vv.offsetHeight;
         $scope.width = vv.offsetWidth;
@@ -106,7 +106,7 @@
         function wordClicked(word){
             alert('text: ' + word.text + ',size: ' + word.size);
         };
-        */
+
 
 
 
