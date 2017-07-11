@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <script src="/angular/angular.js"></script>
+    <script src="/angular-resource/angular-resource.js"></script>
+    <script src="/angular-material/angular-material.js"></script>
+    <script src="/angular-animate/angular-animate.js"></script>
+    <script src="/angular-aria/angular-aria.js"></script>
+    <script src="/angular-route/angular-route.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="/d3-cloud/build/d3.layout.cloud.js"></script>
+    <script src="/angular-d3-word-cloud/dist/angular-word-cloud.min.js"></script>
+
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+
+    <script type="text/javascript" src="/javascripts/twitter.js"></script>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+        <title>twitter</title>
+
+        <link rel="icon" href="../../favicon.ico">
+
+        <!-- Bootstrap core CSS -->
+        <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom styles for this template -->
+        <link rel='stylesheet' href='/stylesheets/dashboard.css' />
+    </head>
+
+    <body id="page-top" datatype="scroll" ng-app="getTweets" ng-controller="twitterController">
+        <header class="hero">
+            <div class="container text-center">
+
+                <a class="hero-brand" href="index.html" title="Home"><img src="images/twitter-64.png"></a>
+                <div class="col-md-12">
+                    <h1 class="col-md-12">Enter Your Username:</h1>
+                </div>
+
+                <input type="text" id="username" ng-model="username" name="username"
+                       class="form-control" placeholder="User name" required autofocus>
+
+                <p class="tagline">
+                    Enter your twitter username, and get all your tweets
+                </p>
+                <md-button class="btn" ng-click="getTweets($event)">
+                    Get all tweets
+                </md-button>
+                <div>
+                    <a href="#overview" class="btn btn-circle page-scroll">
+                        <i class="animated"></i>
+                    </a>
+                </div>
+
+
+            </div>
+        </header>
+
+        <section id="overview">
+            <nav class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-3 col-md-2 sidebar">
+                        <ul class="nav nav-sidebar">
+                            <li class="active">
+                                <a href="#overview">Overview</a>
+                            </li>
+                            <li><a href="#analytics">Analytics
+                                    <span class="sr-only"></span></a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="contents" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                        <h1 class="page-header">These are all your tweets</h1>
+                        <div ng-repeat="tweet in tweets">
+                            <p ng-bind="tweet"></p>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </section>
+
+
+
+        <section id="analytics">
+            <md-button class="btn" ng-click="getReps($event)">
+                Analyze
+            </md-button>
+            <div id="contents" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">These are your representative tweets</h1>
+                <div ng-repeat="tweet in reps">
+                    <p ng-bind="tweet"></p>
+                </div>
+            </div>
+        </section>
+
+
+    </body>
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p>Copyright &copy; Hao Xu 2016</p>
+        </div>
+    </footer>
+</html>
