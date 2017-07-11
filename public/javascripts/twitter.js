@@ -21,8 +21,9 @@
 
     }]);
 
-    getTweets.controller("twitterController",
-                        ["$scope", "tweetResource", "$mdDialog", function ($scope, tweetResource, $mdDialog) {
+    getTweets.controller("twitterController",  ["$scope", "tweetResource", "$mdDialog", "$window", "$element",
+        function ($scope, tweetResource, $window, $element, $mdDialog) {
+
         $scope.tweets = [];
         $scope.username = "";
         $scope.text = "";
@@ -30,29 +31,48 @@
         $scope.customFullscreen = false;
         $scope.reps = [];
         $scope.status= '';
+        $scope.words = [];
 
         $scope.$watch('username', function (value) {
             $scope.username = value;
         });
 
-        $scope.getTweets = function ($event) {
+        $scope.click = function ($event) {
+            getTweets(getReps);
+        }
 
+        function getTweets(callback) {
             tweetResource.tweet.getTweets({name: $scope.username}, function (data) {
                 $scope.tweets = data;
                 $scope.tweets.forEach(function (tweet) {
                     $scope.text += tweet;
                 });
                 $scope.search = true;
+                callback();
             });
+
         };
 
-        $scope.getReps = function ($event) {
+        function getReps() {
             tweetResource.summarizer.getRepTweet({text: $scope.text}, function (data) {
                 $scope.reps = data;
+                $scope.reps.forEach(function (list) {
+                    $scope.words += list.text;
+                })
+
+                $scope.words = $scope.words.split(/\s+/g);
+
+                $scope.words = $scope.words.map(function(word) {
+                    return {
+                        text: word,
+                        count: Math.floor(Math.random() * 4)
+                    }
+                }).sort(function(a, b) {
+                    return b.count - a.count;
+                })
+
             });
         };
-
-
 
         $scope.showConfirm = function(event) {
 
@@ -72,21 +92,12 @@
             }
 
         };
-
-        console.log($scope);
-    }]);
-
-    getTweets.controller("d3Controller", ["$scope", "$window", "$element",
-                        function ($scope, $window, $element) {
-        var self = this;
-        self.height = $window.innerHeight * 0.5;
-        self.width = $element.find('#wordsCloud')[0].offsetWidth;
-        self.wordClicked = wordClicked;
-        self.rotate = rotate;
-        self.words = [
-            {text: 'Angular',size: 25, color: '#6d989e'},
-            {text: 'Angular2',size: 35, color: '#473fa3'}
-        ];
+        /*
+        var vv = document.getElementById("wordsCloud");
+        $scope.height = vv.offsetHeight;
+        $scope.width = vv.offsetWidth;
+        $scope.wordClicked = wordClicked;
+        $scope.rotate = rotate;
 
         function rotate() {
             return ~~(Math.random() * 2) * 90;
@@ -95,9 +106,13 @@
         function wordClicked(word){
             alert('text: ' + word.text + ',size: ' + word.size);
         };
+        */
 
 
+
+        console.log($scope);
     }]);
+
 
 
 })();

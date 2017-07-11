@@ -6,9 +6,15 @@
     <script src="/angular-animate/angular-animate.js"></script>
     <script src="/angular-aria/angular-aria.js"></script>
     <script src="/angular-route/angular-route.js"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="/d3/build/d3.min.js"></script>
     <script src="/d3-cloud/build/d3.layout.cloud.js"></script>
     <script src="/angular-d3-word-cloud/dist/angular-word-cloud.min.js"></script>
+
+    <script src="/javascripts/index.js"></script>
 
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
@@ -31,8 +37,8 @@
         <link rel='stylesheet' href='/stylesheets/dashboard.css' />
     </head>
 
-    <body id="page-top" datatype="scroll" ng-app="getTweets" ng-controller="twitterController">
-        <header class="hero">
+    <body ng-app="getTweets" ng-controller="twitterController">
+        <header class="hero" id="home">
             <div class="container text-center">
 
                 <a class="hero-brand" href="index.html" title="Home"><img src="images/twitter-64.png"></a>
@@ -46,63 +52,81 @@
                 <p class="tagline">
                     Enter your twitter username, and get all your tweets
                 </p>
-                <md-button class="btn" ng-click="getTweets($event)">
+                <md-button class="btn" ng-click="click($event)">
                     Get all tweets
                 </md-button>
-                <div>
-                    <a href="#overview" class="btn btn-circle page-scroll">
-                        <i class="animated"></i>
-                    </a>
-                </div>
-
 
             </div>
         </header>
 
-        <section id="overview">
-            <nav class="container-fluid">
-                <div class="row">
-                    <div class="col-sm-3 col-md-2 sidebar">
-                        <ul class="nav nav-sidebar">
-                            <li class="active">
-                                <a href="#overview">Overview</a>
-                            </li>
-                            <li><a href="#analytics">Analytics
-                                    <span class="sr-only"></span></a>
-                            </li>
-                        </ul>
-                    </div>
+        <div id="wrapper" data-spy="scroll" data-target="#spy" class="">
+            <!-- Sidebar -->
+            <div id="sidebar-wrapper" class="">
+                <nav id="spy">
+                    <ul class="sidebar-nav nav">
+                        <li class="sidebar-brand active"> <a href="#home" class=""><span class="fa fa-home solo">Home</span></a>
 
-                    <div id="contents" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                        <h1 class="page-header">These are all your tweets</h1>
-                        <div ng-repeat="tweet in tweets">
-                            <p ng-bind="tweet"></p>
+                        </li>
+                        <li class=""> <a href="#Overview" data-scroll="" class="">
+                                <span class="fa fa-anchor solo">Overview</span>
+                            </a>
+
+                        </li>
+                        <li class=""> <a href="#Analytics" data-scroll="" class="">
+                                <span class="fa fa-anchor solo">Analytics</span>
+                            </a>
+
+                        </li>
+                        <li class=""> <a href="#Visualization" data-scroll="" class="">
+                                <span class="fa fa-anchor solo">Visualization</span>
+                            </a>
+
+                        </li>
+                        <li class=""> <a href="#Contact" data-scroll="" class="">
+                                <span class="fa fa-anchor solo">Contact</span>
+                            </a>
+
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Page content -->
+            <div id="page-content-wrapper" class="">
+                <div class="page-content inset">
+                    <div class="row">
+                        <div class="col-md-12 ">
+                            <legend id="Overview" style="color: #ffffff;">These are all your tweets!</legend>
+                            <div ng-repeat="tweet in tweets">
+                                <p class="" ng-bind="tweet"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 ">
+                            <legend id="Analytics" style="color: #ffffff;">These are your representative tweets</legend>
+                            <div ng-repeat="rep in reps">
+                                <p class="" ng-bind="rep"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-12 ">
+                            <legend id="Visualization" style="color: #ffffff;">Data visualization</legend>
+                            <p class=""></p>
+                            <p class=""></p>
+                        </div>
+                        <div class="col-md-12 ">
+                            <legend id="Contact" style="color: #ffffff;">Contact</legend>
+                            <p class=""></p>
+                            <p class=""></p>
                         </div>
                     </div>
                 </div>
-            </nav>
-        </section>
-
-
-
-        <section id="analytics">
-            <md-button class="btn" ng-click="getReps($event)">
-                Analyze
-            </md-button>
-            <div id="contents" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-                <h1 class="page-header">These are your representative tweets</h1>
-                <div ng-repeat="tweet in reps">
-                    <p ng-bind="tweet"></p>
-                </div>
             </div>
-        </section>
-
+        </div>
 
     </body>
     <!-- Footer -->
-    <footer>
-        <div class="container text-center">
-            <p>Copyright &copy; Hao Xu 2016</p>
+    <footer style="background: #545454;">
+        <div class="container text-center" >
+            <p style="color: #ffffff;">Copyright &copy; Hao Xu 2016</p>
         </div>
     </footer>
 </html>
