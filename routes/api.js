@@ -5,6 +5,7 @@ var express = require('express');
 var router = express.Router();
 var Twitter = require('twitter');
 var lexrank = require('lexrank');
+var tm = require('text-miner');
 
 var client = new Twitter({
     consumer_key: 'W3gBMoRTPItuWoxpl2cYph5nA',
@@ -21,14 +22,10 @@ router.get('/tweets', function(req, res, next) {
     var texts = [];
     client.get('statuses/user_timeline', params, function(error, tweets) {
 
-        if (!error) {
-            //console.log(tweets);
-            tweets.forEach(function (data) {
-                texts.push(data.text);
-            });
-        } else {
-            console.log(error);
-        }
+        tweets.forEach(function (data) {
+            texts.push(data.text);
+        });
+
         res.end(JSON.stringify(texts));
     }, function (error) {
         next(error);
@@ -36,13 +33,55 @@ router.get('/tweets', function(req, res, next) {
 });
 
 router.get('/summarizer', function (req, res, next) {
-    var originalText = req.query.text;
-    var topLines = lexrank.summarize(originalText, 5, function (err, toplines, text) {
-        if (err) {
-            console.log(err);
-        }
+    var tweets = req.query.text;
+    var originalText = "";
+    tweets.forEach(function (tweet) {
+        var http = tweet.indexOf("http");
+        var slice = tweet.slice(0, http);
+        originalText = originalText + "" + slice;
+    })
+    lexrank.summarize(originalText, 5, function (err, toplines, text) {
         res.end(JSON.stringify(toplines));
+    }, function (error) {
+        next(error);
     });
-})
+});
+
+router.get('/textMining', function (req, res) {
+    var originalText = req.query.text;
+    var words = [];
+    var trimWords = ["https://", "...", "&amp", "&", "rt", "\"", "'", "\\"];
+
+    var my_corpus = new tm.Corpus(originalText);
+    my_corpus
+        .trim()
+        .toLower()
+        .removeNewlines()
+        .removeWords(trimWords)
+        .removeWords(tm.STOPWORDS.EN)
+        .removeDigits()
+        .removeInterpunctuation()
+        .removeInvalidCharacters()
+        .clean()
+
+
+    var terms = new tm.Terms(my_corpus);
+    var texts = terms.findFreqTerms(3);
+
+    texts.forEach(function (word) {
+        if (!trimWords.includes(word.word)) {
+            words.push(({text: word.word, size: word.count}));
+        }
+
+    });
+
+    words.sort(function (a, b) {
+        return b.size - a.size;
+    });
+    //words = words.slice(0, 100);
+
+    res.end(JSON.stringify(words));
+
+});
 
 module.exports = router;

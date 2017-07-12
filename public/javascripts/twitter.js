@@ -10,11 +10,14 @@
             }),
             summarizer: $resource('/api/summarizer', {}, {
                 getRepTweet: {method: 'GET', isArray: true}
+            }),
+            textMining: $resource('/api/textMining', {}, {
+                getText: {method: 'GET', isArray: true}
             })
         };
     }]);
 
-    var getTweets = angular.module('getTweets', ['tweets','ngMaterial', 'angular-d3-word-cloud', ]);
+    var getTweets = angular.module('getTweets', ['tweets','ngMaterial', 'angular-d3-word-cloud']);
 
     getTweets.config(['$httpProvider', function($httpProvider) {
         $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
@@ -26,11 +29,8 @@
 
         $scope.tweets = [];
         $scope.username = "";
-        $scope.text = "";
         $scope.search = false;
-        $scope.customFullscreen = false;
         $scope.reps = [];
-        $scope.status= '';
         $scope.words = [];
 
         $scope.$watch('username', function (value) {
@@ -39,55 +39,43 @@
 
         $scope.click = function ($event) {
             getTweets(getReps, getWords);
-        }
+        };
 
         function getTweets(callback1, callback2) {
             tweetResource.tweet.getTweets({name: $scope.username}, function (data) {
                 $scope.tweets = data;
-                $scope.tweets.forEach(function (tweet) {
-                    $scope.text += tweet;
-                });
                 $scope.search = true;
                 callback1();
                 callback2();
+            }, function (error) {
+                console.alert(error);
             });
 
-        };
-
-        function getWords() {
-            var freq = {};
-            var texts;
-            texts = $scope.text.split(/\s+/g);
-
-
-
-
-            texts.forEach(function (word) {
-                if (!freq[word]) {
-                    freq[word] = 0;
-                }
-                freq[word] += 1;
-            });
-            for (let word in freq) {
-                $scope.words.push({text:word, size:freq[word]});
-            }
-            $scope.words.sort(function (a, b) {
-                return b.size - a.size;
-            })
-            $scope.words = $scope.words.slice(0, 50);
-
-            d3.wordcloud()
-                .size([800, 400])
-                .selector('#cloud')
-                .words($scope.words)
-                .start();
         }
 
         function getReps() {
-            tweetResource.summarizer.getRepTweet({text: $scope.text}, function (data) {
+            tweetResource.summarizer.getRepTweet({text: $scope.tweets}, function (data) {
                 $scope.reps = data;
+            }, function (error) {
+                console.alert(error);
             });
-        };
+        }
+
+        function getWords() {
+
+            tweetResource.textMining.getText({text: $scope.tweets}, function (data) {
+                $scope.words = data;
+
+                d3.wordcloud()
+                    .size([900, 500])
+                    .selector('#cloud')
+                    .words($scope.words)
+                    .start();
+
+            }, function (error) {
+                console.alert(error);
+            });
+        }
 
         $scope.showConfirm = function(event) {
 
@@ -107,8 +95,6 @@
             }
 
         };
-
-
 
         console.log($scope);
     }]);
