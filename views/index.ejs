@@ -15,6 +15,9 @@
     <script src="/d3-cloud/build/d3.layout.cloud.js"></script>
     <script src="/angular-d3-word-cloud/dist/angular-word-cloud.min.js"></script>
 
+    <script src="/chart.js/dist/Chart.min.js"></script>
+    <script src="/angular-chart.js/dist/angular-chart.min.js"></script>
+
     <script src="/javascripts/index.js"></script>
     <script src="/javascripts/wordcloud.js"></script>
 
@@ -75,8 +78,8 @@
                             </a>
 
                         </li>
-                        <li class=""> <a href="#Analytics" data-scroll="" class="">
-                                <span class="fa fa-anchor solo">Analytics</span>
+                        <li class=""> <a href="#Analysis" data-scroll="" class="">
+                                <span class="fa fa-anchor solo">Analysis</span>
                             </a>
 
                         </li>
@@ -105,24 +108,38 @@
                             </div>
                         </div>
                         <div class="col-md-12 ">
-                            <legend id="Analytics" style="color: #ffffff;">These are your representative tweets</legend>
-                            <div ng-repeat="rep in reps">
-                                <p class="" ng-bind="rep"></p>
+                            <legend id="Analysis" style="color: #ffffff;">Representative tweets</legend>
+                            <div id="lexrank" ng-show="data !== null && data.length !== 0">
+                                <h4>Lexrank Result</h4>
+                                <canvas width="800" height="400"  class="chart chart-bar"
+                                        chart-data="data" chart-labels="labels"
+                                        chart-series="series" chart-click="onClick"></canvas>
+                                <div ng-repeat="rep in reps">
+                                    <p>No.{{rep.index}} {{tweets[rep.index]}}</p>
+                                </div>
+                            </div>
+                            <div id="clustering" ng-show="data !== null && data.length !== 0">
+                                <h4>Clustering result</h4>
+                                <div ng-repeat="cluster in clusters.clusters">
+                                    <p>No.{{cluster[0]}} {{tweets[cluster[0]]}}</p>
+                                </div>
+                            </div>
+                            <div id="cluster1" ng-show="data !== null && data.length !== 0">
+                                <h4>Your first cluster</h4>
+                                <div ng-repeat="cluster in clusters.clusters[0]">
+                                    <p>No.{{cluster}} {{tweets[cluster]}}</p>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-12 ">
-                            <legend id="Visualization" style="color: #ffffff;">Data visualization</legend>
+                            <legend id="Visualization" style="color: #ffffff;">Keyword cloud</legend>
                             <div id="wordsCloud">
-                                <!--word-cloud words="words" width="width" height="height" padding="5" rotate="rotate"
-                                            on-click="wordClicked">
-                                </word-cloud-->
                                 <div id="cloud" ng-show="words !== null"></div>
                             </div>
                         </div>
                         <div class="col-md-12 ">
                             <legend id="Contact" style="color: #ffffff;">Contact</legend>
-                            <p class=""></p>
-                            <p class=""></p>
+                            <p class="">Contact at sduxuhao@gmail.com</p>
                         </div>
                     </div>
                 </div>
