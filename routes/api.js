@@ -7,7 +7,7 @@ var Twitter = require('twitter');
 var lexrank = require('lexrank');
 var natural = require('natural');
 var ml = require('machine_learning');
-
+var kMeans = require('kmeans-js');
 
 var client = new Twitter({
     consumer_key: 'W3gBMoRTPItuWoxpl2cYph5nA',
@@ -38,7 +38,7 @@ router.get('/summarizer', function (req, res, next) {
 
     let originalText = preprocessing(req.query.text, null, false);
 
-    lexrank.summarize(originalText, 6, function (err, toplines, text) {
+    lexrank.summarize(originalText, 10, function (err, toplines, text) {
         res.end(JSON.stringify(toplines));
     }, function (error) {
         next(error);
@@ -75,7 +75,7 @@ router.get('/clustering', function (req, res) {
     let tweet_vec = [];
 
     for (let i = 0; i < tweets.length; i++) {
-        let grammer = NGrams.ngrams(tweets[i], 10, null, null);
+        let grammer = NGrams.ngrams(tweets[i], 7, null, null);
         if (grammer !== null && grammer.length !== 0) {
             let features = grammer[0];
             let vec = [];
@@ -100,6 +100,7 @@ router.get('/clustering', function (req, res) {
     });
 
     let clusters = [];
+
     result.clusters.forEach(function (cluster) {
         let new_cluster = [];
         for (let i = 0; i < cluster.length; i++) {
@@ -108,9 +109,28 @@ router.get('/clustering', function (req, res) {
         clusters.push(new_cluster);
     });
 
-    let finales = {clusters: clusters, means: result.means};
+    let ids = [];
+    for (let i = 0; i < result.clusters.length; i++) {
+        let cluster = result.clusters[i];
+        let distances = [];
+        for (let j = 0; j < cluster.length; j++) {
+            distances.push(dist(vectors[cluster[j]], result.means[i]));
+        }
+        let minIdx = distances.indexOf(Math.min(...distances));
+        ids.push(tweet_vec[cluster[minIdx]].index);
+    }
+
+    let finales = {clusters: clusters, means: result.means, center: ids};
     res.end(JSON.stringify(finales));
 });
+
+function dist(arr1, arr2) {
+    let dist = 0;
+    for (let i = 0; i < arr1.length; i++) {
+        dist += Math.pow((arr1[i] - arr2[i]), 2)
+    }
+    return Math.pow(dist, 0.5);
+}
 
 function preprocessing(text, username, isArray) {
     let originalText = "";

@@ -13,7 +13,6 @@
     <script src="/d3/d3.js"></script>
     <script src="/c3/c3.js"></script>
     <script src="/d3-cloud/build/d3.layout.cloud.js"></script>
-    <script src="/angular-d3-word-cloud/dist/angular-word-cloud.min.js"></script>
 
     <script src="/chart.js/dist/Chart.min.js"></script>
     <script src="/angular-chart.js/dist/angular-chart.min.js"></script>
@@ -120,12 +119,12 @@
                             </div>
                             <div id="clustering" ng-show="data !== null && data.length !== 0">
                                 <h4>Clustering result</h4>
-                                <div ng-repeat="cluster in clusters.clusters">
-                                    <p>No.{{cluster[0]}} {{tweets[cluster[0]]}}</p>
+                                <div ng-repeat="center in clusters.center">
+                                    <p>No.{{center}} {{tweets[center]}}</p>
                                 </div>
                             </div>
                             <div id="cluster1" ng-show="data !== null && data.length !== 0">
-                                <h4>Your first cluster</h4>
+                                <h4>One of your clusters</h4>
                                 <div ng-repeat="cluster in clusters.clusters[0]">
                                     <p>No.{{cluster}} {{tweets[cluster]}}</p>
                                 </div>
