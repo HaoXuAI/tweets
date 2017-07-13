@@ -96,6 +96,7 @@ we can see the results of two methods are almost different, with only one inters
 ## keywords
 Use TFIDF to find the representaive words of all tweets, represented by wordCloud.
 
+<img src = "https://github.com/cmuhao/tweets/blob/master/public/images/word_cloud.png" align = "center"></img>
 
 ## References
 
