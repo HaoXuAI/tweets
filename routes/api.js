@@ -17,6 +17,7 @@ var Twitter = require('twitter');
 var lexrank = require('lexrank');
 var natural = require('natural');
 var ml = require('machine_learning');
+var sw = require('stopword')
 
 var client = new Twitter({
     consumer_key: 'W3gBMoRTPItuWoxpl2cYph5nA',
@@ -76,6 +77,7 @@ router.get('/clustering', function (req, res) {
 
     tfidf.addDocument(originalText);
 
+    /* get n-gram with n = 7 */
     let tweet_vec = [];
 
     for (let i = 0; i < tweets.length; i++) {
@@ -174,7 +176,11 @@ function preprocessing(text, username, isArray) {
     let tweets = [];
     text.forEach(function (tweet) {
         let slice = tweet.replace(/[\n/\\\n/!/?/]+/g, " ").replace(/[^A-Za-z]/g, " ");
-        slice = slice.replace("RT", "").replace("amp", "");
+        slice = slice.replace("RT", "").replace("amp", "").split(' ');
+
+        let arr = sw.removeStopwords(slice);
+        slice = arr.join(' ');
+
         if (username !== null) {
             slice = slice.replace(username, "");
         }

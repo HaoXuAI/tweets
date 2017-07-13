@@ -27,6 +27,7 @@
     "morgan": "~1.8.1",
     "natural": "^0.5.4",
     "serve-favicon": "~2.4.2",
+    "stopword": "^0.1.6",
     "text-miner": "^1.0.5",
     "twitter": "^1.7.1",
     "write": "^1.0.3"

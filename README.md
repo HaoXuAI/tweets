@@ -6,10 +6,10 @@ Web Architecture:
 
 Frontend is designing with AngularJS + Bootstrap, backend server is running on node.js. data visualized in d3.js.
 
+A simple website UML:
+
 <img src="https://github.com/cmuhao/tweets/blob/master/webUML.jpg" align="center"></img>
 
-
-<p align="center">simple website UML</p>
 
 To run on local server:
 
@@ -22,15 +22,8 @@ node www
 
 the server is listening on: http://localhost:3000
 
-There are two methods I'm using to find the representative tweets.
-
-lexrank:
-https://www.cs.cmu.edu/afs/cs/project/jair/pub/volume22/erkan04a-html/erkan04a.html
-
-clustering: http://nlp.cic.ipn.mx/Publications/2008/Text%20Summarization%20by%20Sentence%20Extraction%20Using.pdf
-
 ## preprocessing
-I preprocess and tokenize the text by removing the http link, and some other meaningless words like "RT, &amp", and
+I preprocess and tokenize the text by removing the http link, unrecognized character, stopwords, and some other meaningless words like "RT, &amp", and
 username.
 
 ## Methods
@@ -42,7 +35,7 @@ evaluating the result, I'm comparing it with the clustering result.
 ### clustering
 Steps:
 
-1. use 10-gram to decide the size of features of each sentence.
+1. use ngram (n = 7) to decide the size of features of each sentence.
 2. use TFIDF to weight each feature of sentence.
 3. use k-means (k = 10) to do clustering.
 4. after K-means finishes, select the closest sentence (most rep-
@@ -101,3 +94,14 @@ we can see the results of two methods are almost different, with only one inters
 
 ## keywords
 Use TFIDF to find the representaive words of all tweets, represented by wordCloud.
+
+
+## References
+
+lexrank:
+
+https://www.cs.cmu.edu/afs/cs/project/jair/pub/volume22/erkan04a-html/erkan04a.html
+
+clustering: 
+
+http://nlp.cic.ipn.mx/Publications/2008/Text%20Summarization%20by%20Sentence%20Extraction%20Using.pdf
