@@ -40,17 +40,46 @@
     }]);
 
     getTweets.controller("twitterController",  ["$scope", "tweetResource", "$window", "$element", "$mdDialog",
-        function ($scope, tweetResource, $window, $element, $mdDialog) {
+    function ($scope, tweetResource, $window, $element, $mdDialog) {
 
+        /**
+         * user's tweets
+         * @type {Array}
+         */
         $scope.tweets = [];
+        /**
+         * username
+         * @type {string}
+         */
         $scope.username = "";
-        $scope.text = "";
-        $scope.search = false;
+        /**
+         * representative tweets
+         * @type {Array}
+         */
         $scope.reps = [];
-        $scope.clusters;
+        /**
+         * tweet clusters
+         */
+        $scope.clusters = {};
+        /**
+         * tweet key words
+         * @type {Array}
+         */
         $scope.words = [];
+        /**
+         * chart-label
+         * @type {Array}
+         */
         $scope.labels = [];
+        /**
+         * chart data
+         * @type {Array}
+         */
         $scope.data = [];
+        /**
+         * chart-series
+         * @type {[*]}
+         */
         $scope.series = ['weight'];
 
         $scope.$watch('username', function (value) {
@@ -73,6 +102,11 @@
             );
         };
 
+        /**
+         * get all tweets of a user
+         * @param callback1
+         * @param callback2
+         */
         function getTweets(callback1, callback2) {
             tweetResource.tweet.getTweets({name: $scope.username}, function (data) {
                 $scope.tweets = data;
@@ -85,6 +119,9 @@
 
         }
 
+        /**
+         * get representative tweets of a user's tweets
+         */
         function getReps() {
             tweetResource.summarizer.lexrank({text: $scope.tweets}, function (data) {
                 $scope.reps = data;
@@ -103,6 +140,9 @@
             });
         }
 
+        /**
+         * get key words of a user's tweets
+         */
         function getWords() {
 
             tweetResource.getKeyWords.tfidf({name: $scope.username, text: $scope.tweets}, function (data) {
