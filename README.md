@@ -6,7 +6,10 @@ Web Architecture:
 
 Frontend is designing with AngularJS + Bootstrap, backend server is running on node.js. data visualized in d3.js.
 
-![Alt text](https://github.com/cmuhao/tweets/blob/master/webUML.jpg)
+<img src="https://github.com/cmuhao/tweets/blob/master/webUML.jpg" align="center"></img>
+
+
+<p align="center">simple website UML</p>
 
 To run on local server:
 
