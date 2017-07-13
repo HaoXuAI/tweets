@@ -129,7 +129,7 @@
                 $scope.labels = [];
                 data.forEach(function (rep) {
                     $scope.data.push(rep.weight);
-                    $scope.labels.push(rep.index);
+                    $scope.labels.push(rep.index + 1);
                 });
 
             }, tweetResource.cluster.clustering({text: $scope.tweets}, function(data) {

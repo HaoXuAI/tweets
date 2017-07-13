@@ -15,6 +15,7 @@ To run on local server:
 
 ```
 git clone https://github.com/cmuhao/tweets.git
+cd tweets
 npm install
 cd bin
 node www
