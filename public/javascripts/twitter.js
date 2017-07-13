@@ -1,4 +1,7 @@
-
+/**
+ * Created by hao on 7/8/17.
+ * the module and controller of the frontend client.
+ */
 (function () {
 
     var tweets = angular.module('tweets', ['ngRoute','ngResource']);
@@ -36,8 +39,8 @@
         });
     }]);
 
-    getTweets.controller("twitterController",  ["$scope", "tweetResource", "$mdDialog", "$window",
-        "$element", "$timeout", function ($scope, tweetResource, $window, $element, $mdDialog, $timeout) {
+    getTweets.controller("twitterController",  ["$scope", "tweetResource", "$window", "$element", "$mdDialog",
+        function ($scope, tweetResource, $window, $element, $mdDialog) {
 
         $scope.tweets = [];
         $scope.username = "";
@@ -56,6 +59,18 @@
 
         $scope.click = function ($event) {
             getTweets(getReps, getWords);
+
+            $mdDialog.show(
+                $mdDialog.alert()
+                    .parent(angular.element(document.querySelector('#popupContainer')))
+                    .clickOutsideToClose(true)
+                    .title('What\'s next!')
+                    .textContent('It might take 15 seconds to do the analysis.' +
+                        ' You can scroll page down to see the result.')
+                    .ariaLabel('Alert Dialog Demo')
+                    .ok('Got it!')
+                    .targetEvent($event)
+            );
         };
 
         function getTweets(callback1, callback2) {
@@ -73,10 +88,13 @@
         function getReps() {
             tweetResource.summarizer.lexrank({text: $scope.tweets}, function (data) {
                 $scope.reps = data;
+                $scope.data = [];
+                $scope.labels = [];
                 data.forEach(function (rep) {
                     $scope.data.push(rep.weight);
                     $scope.labels.push(rep.index);
-                })
+                });
+
             }, tweetResource.cluster.clustering({text: $scope.tweets}, function(data) {
                 $scope.clusters = data;
 
@@ -90,6 +108,7 @@
             tweetResource.getKeyWords.tfidf({name: $scope.username, text: $scope.tweets}, function (data) {
                 $scope.words = data;
 
+                document.getElementById("cloud").innerHTML = "";
                 d3.wordcloud()
                     .size([900, 500])
                     .selector('#cloud')
@@ -101,37 +120,7 @@
             });
         }
 
-        $scope.showConfirm = function(event) {
-
-            if ($scope.tweets !== null && $scope.tweets.length !== 0) {
-
-                var confirm = $mdDialog.confirm()
-                    .title('These are all your tweets!')
-                    .textContent($scope.tweets)
-                    .targetEvent(event)
-                    .ok('Analyze')
-                    .cancel('Cancel');
-                $mdDialog.show(confirm).then(function() {
-                    $scope.status = 'Analyze';;
-                }, function() {
-                    $scope.status = 'Cancel';
-                });
-            }
-
-        };
-
-        $scope.onClick = function (points, evt) {
-            console.log(points, evt);
-        };
-
-        // Simulate async data update
-        $timeout(function () {
-
-        }, 3000);
-
         console.log($scope);
     }]);
-
-
 
 })();

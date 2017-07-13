@@ -1,5 +1,15 @@
 /**
  * Created by hao on 7/8/17.
+ *
+ * four api implementation:
+ * 1. tweets, get tweets of a user
+ * 2. summarizer, user lexrank to summarize
+ * 3. clustering, user clustering to summarize
+ * 4. getKeywords, get key words.
+ *
+ * two helper functions:
+ * 1. dist, get distance of two sentences
+ * 2. preprocessing, preprocess text
  */
 var express = require('express');
 var router = express.Router();
@@ -7,7 +17,6 @@ var Twitter = require('twitter');
 var lexrank = require('lexrank');
 var natural = require('natural');
 var ml = require('machine_learning');
-var kMeans = require('kmeans-js');
 
 var client = new Twitter({
     consumer_key: 'W3gBMoRTPItuWoxpl2cYph5nA',
@@ -16,8 +25,11 @@ var client = new Twitter({
     access_token_secret: 'EYdfi5ouuN9R80gR4AuCSIDxcJbJkFuJoVfupm5kGLQpg'
 });
 
-/* GET tweets. */
 
+/**
+ *  get tweets api, which counts to 200, might be optimized by asynchronous to
+ *  get all tweets of a user.
+ */
 router.get('/tweets', function(req, res, next) {
 
     let params = {screen_name: req.query.name, count: 200};
@@ -34,6 +46,9 @@ router.get('/tweets', function(req, res, next) {
     });
 });
 
+/**
+ * use lexrank to summarize, up to 10 representatives.
+ */
 router.get('/summarizer', function (req, res, next) {
 
     let originalText = preprocessing(req.query.text, null, false);
@@ -46,21 +61,10 @@ router.get('/summarizer', function (req, res, next) {
 
 });
 
-router.get('/getKeywords', function (req, res) {
-
-    let originalText = preprocessing(req.query.text, req.query.name, false);
-    let words = [];
-    var Tfidf = natural.TfIdf;
-    var tfidf = new Tfidf();
-
-    tfidf.addDocument(originalText);
-    tfidf.listTerms(0).forEach(function(item) {
-        words.push({text: item.term, size: item.tfidf});
-    });
-
-    res.end(JSON.stringify(words));
-});
-
+/**
+ * use clustering to clustering tweets and get representative tweet of each
+ * cluster, weighted by the shortest distance.
+ */
 router.get('/clustering', function (req, res) {
     var NGrams = natural.NGrams;
 
@@ -91,6 +95,7 @@ router.get('/clustering', function (req, res) {
         vectors.push(vector.vec);
     });
 
+    /* use k-means to do clustering */
     var result = ml.kmeans.cluster({
         data : vectors,
         k : 10,
@@ -99,6 +104,7 @@ router.get('/clustering', function (req, res) {
         distance : {type : "pearson"}
     });
 
+    /* find shortest distance to centroid */
     let clusters = [];
 
     result.clusters.forEach(function (cluster) {
@@ -124,6 +130,30 @@ router.get('/clustering', function (req, res) {
     res.end(JSON.stringify(finales));
 });
 
+/**
+ * get key words of a user, weighted by TFIDF
+ */
+router.get('/getKeywords', function (req, res) {
+
+    let originalText = preprocessing(req.query.text, req.query.name, false);
+    let words = [];
+    var Tfidf = natural.TfIdf;
+    var tfidf = new Tfidf();
+
+    tfidf.addDocument(originalText);
+    tfidf.listTerms(0).forEach(function(item) {
+        words.push({text: item.term, size: item.tfidf});
+    });
+
+    res.end(JSON.stringify(words));
+});
+
+/**
+ * helper function to return distance of two vectors
+ * @param arr1
+ * @param arr2
+ * @returns {number}
+ */
 function dist(arr1, arr2) {
     let dist = 0;
     for (let i = 0; i < arr1.length; i++) {
@@ -132,6 +162,13 @@ function dist(arr1, arr2) {
     return Math.pow(dist, 0.5);
 }
 
+/**
+ * helper function to pre-process and tokenize text
+ * @param text
+ * @param username
+ * @param isArray
+ * @returns {*}
+ */
 function preprocessing(text, username, isArray) {
     let originalText = "";
     let tweets = [];
