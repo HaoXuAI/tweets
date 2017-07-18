@@ -203,6 +203,10 @@ router.get('/word2vec', function (req, res) {
 
 /**
  * this function is to convert sentence to vectors
+ * @param file
+ * @param text
+ * @param username
+ * @param callback
  */
 function sentence2vec(file, text, username, callback) {
 
