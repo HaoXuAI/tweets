@@ -17,7 +17,10 @@ var Twitter = require('twitter');
 var lexrank = require('lexrank');
 var natural = require('natural');
 var ml = require('machine_learning');
-var sw = require('stopword')
+var sw = require('stopword');
+var w2v = require('word2vec');
+var fs = require('fs');
+
 
 var client = new Twitter({
     consumer_key: 'W3gBMoRTPItuWoxpl2cYph5nA',
@@ -67,10 +70,10 @@ router.get('/summarizer', function (req, res, next) {
  * cluster, weighted by the shortest distance.
  */
 router.get('/clustering', function (req, res) {
-    var NGrams = natural.NGrams;
+    let NGrams = natural.NGrams;
 
-    var Tfidf = natural.TfIdf;
-    var tfidf = new Tfidf();
+    let Tfidf = natural.TfIdf;
+    let tfidf = new Tfidf();
 
     let tweets = preprocessing(req.query.text, null, true);
     let originalText = preprocessing(req.query.text, req.query.username, false);
@@ -98,7 +101,7 @@ router.get('/clustering', function (req, res) {
     });
 
     /* use k-means to do clustering */
-    var result = ml.kmeans.cluster({
+    let result = ml.kmeans.cluster({
         data : vectors,
         k : 10,
         epochs: 100,
@@ -131,6 +134,130 @@ router.get('/clustering', function (req, res) {
     let finales = {clusters: clusters, means: result.means, center: ids};
     res.end(JSON.stringify(finales));
 });
+
+/**
+ * try to use word2vec method
+ */
+router.get('/word2vec', function (req, res) {
+
+    let text = req.query.text;
+    let username = req.query.name;
+
+    let corpus = preprocessing(text, username, true);
+
+    let input = "./public/files/" + username + "_train.txt";
+    let vectors = "./public/files/" + username + "_vectors.txt";
+
+    let param_vec = {
+        cbow:1,
+        size: 200,
+        window: 8,
+        negative: 25,
+        hs: 0,
+        sample: 1e-4,
+        threads: 1,
+        iter: 15,
+        minCount: 2,
+        silent: true
+    };
+
+    /* call word2vec to get vector representation of words, then call sentence2vec */
+    fs.stat(input, function (err, stat) {
+        if (err === null) {
+            console.log("input file exists");
+            fs.stat(vectors, function (erro, stat) {
+                if (err === null) {
+                    console.log("vector file exists");
+                    sentence2vec(vectors, text, username, function (data) {
+                        res.end(JSON.stringify(data));
+                    });
+                } else {
+                    w2v.word2vec(input, vectors, param_vec, function (err) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        sentence2vec(vectors, text, username, function (data) {
+                            res.end(JSON.stringify(data));
+                        });
+                    });
+                }
+            })
+        } else if (err.code === 'ENOENT') {
+            // file does not exist
+            fs.writeFile(input, corpus, function (err) {
+                if (err) {
+                    console.log(err);
+                }
+                w2v.word2vec(input, vectors, param_vec, function (err) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    sentence2vec(vectors, text, username, function (data) {
+                        res.end(JSON.stringify(data));
+                    });
+                });
+            });
+        }
+    });
+});
+
+/**
+ * this function is to convert sentence to vectors
+ */
+function sentence2vec(file, text, username, callback) {
+
+    let originalText = preprocessing(text, username, false);
+    let tweets = preprocessing(text, username, true);
+
+    let Tfidf = natural.TfIdf;
+    let tfidf = new Tfidf();
+
+    tfidf.addDocument(originalText);
+
+    /* load all vectors by word2vec */
+    w2v.loadModel(file, function (error, model) {
+
+        let weights = [];
+        tweets.forEach(function (tweet) {
+            let words = tweet.split(" ");
+            let vec = new Array(10).fill(0);
+            for (let i = 0; i < words.length; i++) {
+                let wordVec = model.getVector(words[i]);
+                if (wordVec !== null && i < 10) {
+                    let vec_ave = wordVec.values.reduce(function (sum, value) {
+                            return sum + value;
+                        }) / 200;
+                    let vec_tfidf = tfidf.tfidf(words[i], 0);
+                    vec[i] = vec_ave * vec_tfidf;
+                }
+            }
+            weights.push(vec);
+        });
+
+        /* use k-means to do clustering */
+        let result = ml.kmeans.cluster({
+            data : weights,
+            k : 10,
+            epochs: 100,
+
+            distance : {type : "pearson"}
+        });
+
+        let ids = [];
+        for (let i = 0; i < result.clusters.length; i++) {
+            let cluster = result.clusters[i];
+            let distances = [];
+            for (let j = 0; j < cluster.length; j++) {
+                distances.push(dist(weights[cluster[j]], result.means[i]));
+            }
+            let minIdx = distances.indexOf(Math.min(...distances));
+            ids.push(cluster[minIdx]);
+        }
+
+        let finales = {clusters: result.clusters, means: result.means, center: ids};
+        callback(finales);
+    })
+}
 
 /**
  * get key words of a user, weighted by TFIDF
@@ -190,6 +317,9 @@ function preprocessing(text, username, isArray) {
         if (slice[-1] !== '.') {
             slice += '. ';
         }
+
+        slice = slice.replace(/ +/g, " ");
+
         tweets.push(slice);
         originalText = originalText + slice;
     });

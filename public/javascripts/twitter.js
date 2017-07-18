@@ -20,6 +20,9 @@
             }),
             cluster: $resource('/api/clustering', {}, {
                 clustering: {method: 'GET', isArray: false}
+            }),
+            word2vec: $resource('/api/word2vec', {}, {
+                getVec: {method: 'GET', isArray: false}
             })
         };
     }]);
@@ -87,7 +90,8 @@
         });
 
         $scope.click = function ($event) {
-            getTweets(getReps, getWords);
+            //getTweets(getReps, getWords);
+            getTweets(getVec, getWords);
 
             $mdDialog.show(
                 $mdDialog.alert()
@@ -117,6 +121,25 @@
                 console.alert(error);
             });
 
+        }
+
+        function getVec() {
+            tweetResource.summarizer.lexrank({text: $scope.tweets}, function (data) {
+                $scope.reps = data;
+                $scope.data = [];
+                $scope.labels = [];
+                data.forEach(function (rep) {
+                    $scope.data.push(rep.weight);
+                    $scope.labels.push(rep.index + 1);
+                });
+
+            }, tweetResource.word2vec.getVec({text: $scope.tweets, name: $scope.username}, function(data) {
+                console.log(data);
+                $scope.clusters = data;
+
+            }), function (error) {
+                console.alert(error);
+            });
         }
 
         /**
