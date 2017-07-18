@@ -34,14 +34,16 @@ which means it consider relations between sentence, but that is not necessary. A
 evaluating the result, I'm comparing it with the clustering result.
 
 ### clustering
+
 Steps:
 
 1. use ngram (n = 7) to decide the size of features of each sentence.
+    1. here I've updated using word2vec to get vector representation of words. then average of Word2Vec vectors with TF-IDF.
+    In that case you can skip step 2.
 2. use TFIDF to weight each feature of sentence.
 3. use k-means (k = 10) to do clustering.
 4. after K-means finishes, select the closest sentence (most rep-
 resentative sentence) to each centroid for composing the summary.
-
 ### test
 username: taylorswift13
 
