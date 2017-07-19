@@ -145,8 +145,8 @@ router.get('/word2vec', function (req, res) {
 
     let corpus = preprocessing(text, username, true);
 
-    let input = "./public/files/" + username + "_train.txt";
-    let vectors = "./public/files/" + username + "_vectors.txt";
+    let input = "../public/files/" + username + "_train.txt";
+    let vectors = "../public/files/" + username + "_vectors.txt";
 
     let param_vec = {
         cbow:1,
