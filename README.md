@@ -11,6 +11,15 @@ A simple website UML:
 <img src="https://github.com/cmuhao/tweets/blob/master/webUML.jpg" align="center"></img>
 
 
+Web Link:
+
+http://13.59.231.130
+
+or
+
+http://ec2-13-59-231-130.us-east-2.compute.amazonaws.com
+
+
 To run on local server:
 
 ```
